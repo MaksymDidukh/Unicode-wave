@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicode Wave Engine</title>
+    <style>
+        :root {
+            --matrix-color: #00ffaa;
+            --bg-color: #05070a;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--matrix-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .cyber-panel {
+            background: rgba(10, 15, 20, 0.95);
+            border: 2px solid var(--matrix-color);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 170, 0.15), inset 0 0 15px rgba(0, 255, 170, 0.1);
+            position: relative;
+            max-width: 100%;
+        }
+
+        .cyber-panel::before {
+            content: ''; position: absolute; top: -2px; left: -2px; width: 20px; height: 20px;
+            border-top: 4px solid #fff; border-left: 4px solid #fff;
+        }
+        .cyber-panel::after {
+            content: ''; position: absolute; bottom: -2px; right: -2px; width: 20px; height: 20px;
+            border-bottom: 4px solid #fff; border-right: 4px solid #fff;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            letter-spacing: 3px;
+            text-align: center;
+            color: #ffffff;
+            text-shadow: 0 0 8px var(--matrix-color);
+        }
+
+        #monitor-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            padding: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        #terminal {
+            font-size: 11px;
+            line-height: 9px;
+            letter-spacing: 1px;
+            white-space: pre;
+            display: inline-block;
+            text-align: left;
+            font-weight: bold;
+            text-shadow: 0 0 2px var(--matrix-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 4px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            color: #88a090;
+            text-transform: uppercase;
+        }
+
+        select, button, input {
+            background: #111518;
+            color: var(--matrix-color);
+            border: 1px solid var(--matrix-color);
+            padding: 6px 12px;
+            font-family: inherit;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        button:hover, select:hover {
+            background: var(--matrix-color);
+            color: #000;
+            box-shadow: 0 0 10px var(--matrix-color);
+        }
+
+        .glitch-btn {
+            border-color: #ff0055;
+            color: #ff0055;
+        }
+        .glitch-btn.active {
+            background: #ff0055;
+            color: #fff;
+            box-shadow: 0 0 10px #ff0055;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 10px;
+            border-top: 1px solid #222;
+            padding-top: 8px;
+        }
+
+        /* Стили для юридического подвала (Rechtliches) */
+        .legal-container {
+            margin-top: 40px;
+            max-width: 800px;
+            width: 100%;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+            border-top: 1px dashed #222;
+            padding-top: 20px;
+        }
+
+        .legal-container details {
+            background: #0d1117;
+            padding: 10px 15px;
+            border: 1px solid #222;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .legal-container summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #888;
+            outline: none;
+            user-select: none;
+        }
+
+        .legal-container summary:hover {
+            color: var(--matrix-color);
+        }
+
+        .legal-content {
+            margin-top: 15px;
+            color: #aaa;
+        }
+
+        .legal-content h2 {
+            font-size: 14px;
+            color: #fff;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="cyber-panel">
+    <h1>[ UNICODE WAVE ENGINE v2.5 ]</h1>
+    
+    <div class="controls">
+        <button id="start-btn">CORE_START.EXE</button>
+        
+        <div>
+            <label for="mode">Поток: </label>
+            <select id="mode">
+                <option value="circles">🌀 Спиральные Круги</option>
+                <option value="lines">⚔️ Векторные Лучи</option>
+                <option value="wave">🌊 Квантовая Волна</option>
+                <option value="matrix">🧬 Матричный Дождь</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="symbols">Набор: </label>
+            <select id="symbols">
+                <option value="blocks">Сложные Блоки</option>
+                <option value="arrows">Стрелки (⚙️)</option>
+                <option value="braille">Точки Брайля</option>
+                <option value="math">Математика</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="sens">Gain: </label>
+            <input type="range" id="sens" min="0.5" max="5" step="0.1" value="2.0" style="width: 70px;">
+        </div>
+
+        <button id="glitch-btn" class="glitch-btn">GLITCH: OFF</button>
+    </div>
+
+    <div id="monitor-zone">
+        <div id="terminal"></div>
+    </div>
+    
+    <div class="status-bar">
+        <span id="status-text">SYSTEM: IDLE</span>
+        <span id="fps-counter">FPS: 0</span>
+    </div>
+</div>
+
+<!-- ЮРИДИЧЕСКИЙ БЛОК ДЛЯ ГЕРМАНИИ (IMPRESSUM & DSGVO) -->
+<div class="legal-container">
+    <details>
+        <summary>Rechtliche Hinweise (Impressum & Datenschutz)</summary>
+        <div class="legal-content">
+            
+            <!-- 1. IMPRESSUM (Закон § 5 TMG) -->
+            <h2>Impressum</h2>
+            <p>Angaben gemäß § 5 TMG:</p>
+            <p>
+                <strong>Betreiber der Website:</strong><br>
+                [Ваше Имя и Фамилия, например: Max Mustermann]<br>
+                [Ваш уличный адрес и номер дома, например: Musterstraße 12]<br>
+                [Ваш почтовый индекс и город, например: 10115 Berlin]<br>
+                Germany
+            </p>
+            <p>
+                <strong>Kontakt:</strong><br>
+                E-Mail: [Ваш Email, например: info@my-domain.de]<br>
+                Telefon: [Ваш номер телефона, например: +49 123 456789]
+            </p>
+            <p><em>Haftungshinweis: Dies ist eine rein private, nicht-kommerzielle Website zu Unterhaltungszwecken.</em></p>
+
+            <hr style="border: 0; border-top: 1px solid #222; margin: 20px 0;">
+
+            <!-- 2. DATENSCHUTZ (Закон DSGVO / GDPR) -->
+            <h2>Datenschutzerklärung (DSGVO)</h2>
+            
+            <h3>1. Allgemeine Hinweise</h3>
+            <p>Diese Datenschutzerklärung klärt Sie über die Art, den Umfang und Zweck der Verarbeitung von personenbezogenen Daten auf dieser Website auf. Der Betreiber nimmt Ihren Datenschutz sehr ernst.</p>
+            
+            <h3>2. Mikrofon-Zugriff (Web Audio API)</h3>
+            <p>Diese Website bietet eine Audio-Visualisierung. Dafür wird der Zugriff auf das Mikrofon Ihres Endgeräts benötigt. </p>
+            <p><strong>WICHTIG:</strong> Die Verarbeitung der Audiodaten erfolgt <strong>ausschließlich lokal in Ihrem Browser (On-the-fly)</strong>. Es werden zu keinem Zeitpunkt Audiodaten aufgezeichnet, auf Ihrem Endgerät gespeichert oder an externe Server übertragen. Sobald Sie den Browser-Tab schließen oder den Zugriff entziehen, stoppt die Verarbeitung sofort.</p>
+            <p>Die Rechtsgrundlage für diese Verarbeitung ist Ihre Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO, die Sie durch das Klicken auf den Button "CORE_START.EXE" erteilen.</p>
+            
+            <h3>3. Server-Log-Files</h3>
+            <p>Der Provider dieser Website erhebt und speichert automatisch Informationen in sogenannten Server-Log-Dateien, die Ihr Browser automatisch an uns übermittelt (z.B. IP-Adresse, Browsertyp, Referrer URL, Uhrzeit der Anfrage). Diese Daten sind für den technischen Betrieb notwendig и обрабатываются в соответствии с Art. 6 Abs. 1 lit. f DSGVO.</p>
+            
+            <h3>4. Cookies und Tracking</h3>
+            <p>Diese Website verwendet keine Cookies, keine Werbe-Tracker (wie Google Analytics) und bindet keine externen Schriftarten (wie Google Fonts) ein. Alle Funktionen und Styles werden lokal von diesem Server geladen.</p>
+        </div>
+    </details>
+</div>
+
+<script>
+    const WIDTH = 70; 
+    const HEIGHT = 32; 
+    
+    const terminal = document.getElementById('terminal');
+    const startBtn = document.getElementById('start-btn');
+    const modeSelect = document.getElementById('mode');
+    const symbolsSelect = document.getElementById('symbols');
+    const sensInput = document.getElementById('sens');
+    const glitchBtn = document.getElementById('glitch-btn');
+    const statusText = document.getElementById('status-text');
+    const fpsCounter = document.getElementById('fps-counter');
+
+    let audioCtx, analyser, dataArray, source;
+    let isStreamActive = false;
+    let angle = 0;
+    let useGlitch = false;
+    let lastFrameTime = performance.now();
+    let frameCount = 0;
+
+    const unicodeSets = {
+        blocks:  [' ', ' ', '▖', '▗', '▘', '▝', '▄', '▞', '▟', '■', '▓', '█'],
+        arrows:  [' ', '·', '↑', '↗', '→', '↘', '↓', '↙', '←', '↖', '雙', '⚙'],
+        braille: [' ', '⠁', '⠂', '⠃', '⠄', '⠅', '⠆', '⠇', '⠍', '⠵', '⠾', '⠿'],
+        math:    [' ', '·', '÷', '±', '≠', '≤', '≥', '∑', '∏', '√', '∝', '∞']
+    };
+
+    let matrixDrops = Array(WIDTH).fill(0);
+
+    function initBlankScreen() {
+        let grid = '';
+        for (let y = 0; y < HEIGHT; y++) grid += ' '.repeat(WIDTH) + '\n';
+        terminal.textContent = grid;
+    }
+    initBlankScreen();
+
+    glitchBtn.addEventListener('click', () => {
+        useGlitch = !useGlitch;
+        glitchBtn.classList.toggle('active', useGlitch);
+        glitchBtn.textContent = useGlitch ? "GLITCH: ON" : "GLITCH: OFF";
+    });
+
+    startBtn.addEventListener('click', async () => {
+        if (isStreamActive) return;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 512;
+            
+            source = audioCtx.createMediaStreamSource(stream);
+            source.connect(analyser);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            
+            isStreamActive = true;
+            statusText.textContent = "SYSTEM: CORE_ONLINE";
+            statusText.style.color = "#00ffaa";
+            startBtn.style.display = "none";
+
+            renderLoop();
+        } catch (err) {
+            statusText.textContent = "CRITICAL ERROR: NO MIC ACCESS";
+            statusText.style.color = "#ff0055";
+        }
+    });
+
+    function renderLoop() {
+        if (!isStreamActive) return;
+        requestAnimationFrame(renderLoop);
+
+        frameCount++;
+        let now = performance.now();
+        if (now - lastFrameTime >= 1000) {
+            fpsCounter.textContent = `FPS: ${frameCount}`;
+            frameCount = 0;
+            lastFrameTime = now;
+        }
+
+        const mode = modeSelect.value;
+        const chars = unicodeSets[symbolsSelect.value];
+        const sens = parseFloat(sensInput.value);
+
+        if (mode === 'wave') {
+            analyser.getByteTimeDomainData(dataArray);
+        } else {
+            analyser.getByteFrequencyData(dataArray);
+        }
+
+        let sum = 0;
+        for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
+        let avgVolume = sum / dataArray.length;
+
+        let grid = Array(HEIGHT).fill(null).map(() => Array(WIDTH).fill(' '));
+        
+        angle += 0.03 + (avgVolume * 0.0005);
+        const centerX = WIDTH / 2;
+        const centerY = HEIGHT / 2;
+
+        for (let y = 0; y < HEIGHT; y++) {
+            let idx = Math.floor((y / HEIGHT) * (dataArray.length / 3));
+            let val = dataArray[idx] * sens;
+            if (val > (HEIGHT - y) * 8) {
+                grid[y][0] = '┃';
+                grid[y][WIDTH-1] = '┃';
+            }
+        }
+
+        if (mode === 'circles') {
+            for (let i = 0; i < dataArray.length / 2; i++) {
+                let value = dataArray[i] * sens;
+                if (value < 25) continue;
+
+                let radius = (i * 0.22) + (i < 10 ? value * 0.05 : 0);
+                if (radius > WIDTH / 2) continue;
+
+                let points = 20 + i;
+                for (let p = 0; p < points; p++) {
+                    let rotDir = (i % 2 === 0) ? 1 : -1;
+                    let theta = (p / points) * Math.PI * 2 + (angle * rotDir);
+                    
+                    let x = Math.floor(centerX + radius * Math.cos(theta) * 2.2);
+                    let y = Math.floor(centerY + radius * Math.sin(theta));
+
+                    if (x > 1 && x < WIDTH - 2 && y >= 0 && y < HEIGHT) {
+                        let charIdx = Math.min(Math.floor((value / 255) * chars.length), chars.length - 1);
+                        grid[y][x] = chars[charIdx];
+                    }
+                }
+            }
+        } 
+        else if (mode === 'lines') {
+            let activeLines = 6;
+            let maxLen = Math.min(centerX, centerY) * 1.3;
+            
+            for (let l = 0; l < activeLines; l++) {
+                let currentAngle = angle + (l * (Math.PI * 2 / activeLines));
+                let freqIdx = Math.floor(l * (dataArray.length / activeLines) * 0.3);
+                let currentLen = Math.min(maxLen, (dataArray[freqIdx] * sens) * 0.12);
+
+                for (let d = 0; d < currentLen; d++) {
+                    let x = Math.floor(centerX + d * Math.cos(currentAngle) * 2.2);
+                    let y = Math.floor(centerY + d * Math.sin(currentAngle));
+
+                    if (x > 1 && x < WIDTH - 2 && y >= 0 && y < HEIGHT) {
+                        let charIdx = Math.min(Math.floor((d / maxLen) * chars.length), chars.length - 1);
+                        grid[y][x] = chars[charIdx];
+                    }
+                }
+            }
+        } 
+        else if (mode === 'wave') {
+            for (let x = 2; x < WIDTH - 2; x++) {
+                let dataIdx = Math.floor((x / WIDTH) * dataArray.length);
+                let v = dataArray[dataIdx] / 128.0; 
+                let y = Math.floor((v * centerY) * (sens * 0.7) - (centerY * ((sens * 0.7) - 1)));
+
+                if (y >= 0 && y < HEIGHT) {
+                    let intensity = Math.abs(dataArray[dataIdx] - 128) * sens;
+                    let charIdx = Math.min(Math.floor((intensity / 128) * chars.length), chars.length - 1);
+                    if (charIdx < 1) charIdx = 1;
+
+                    grid[y][x] = chars[charIdx];
+
+                    let start = Math.min(centerY, y);
+                    let end = Math.max(centerY, y);
+                    for (let f = start + 1; f < end; f++) {
+                        if (grid[f][x] === ' ') grid[f][x] = '░';
+                    }
+                }
+            }
+        }
+        else if (mode === 'matrix') {
+            for (let x = 2; x < WIDTH - 2; x++) {
+                let freqIdx = Math.floor((x / WIDTH) * (dataArray.length * 0.5));
+                let volumeFactor = dataArray[freqIdx] / 255;
+
+                if (Math.random() < 0.1 * sens * volumeFactor) {
+                    matrixDrops[x] = 0;
+                } else {
+                    matrixDrops[x] += 0.4;
+                }
+
+                let currentY = Math.floor(matrixDrops[x]);
+                if (currentY >= HEIGHT) matrixDrops[x] = 0;
+
+                for(let trail = 0; trail < 6; trail++) {
+                    let yTrack = currentY - trail;
+                    if (yTrack >= 0 && yTrack < HEIGHT) {
+                        let charIdx = Math.min(chars.length - 1, chars.length - 1 - trail);
+                        if(charIdx > 0) grid[yTrack][x] = chars[charIdx];
+                    }
+                }
+            }
+        }
+
+        if (useGlitch && avgVolume > 60) {
+            let glitchCount = Math.floor(avgVolume * 0.2);
+            const glitchSymbols = ['▲', '▼', '⚡', '∅', '💾', ' ERROR ', '01', '█'];
+            for (let g = 0; g < glitchCount; g++) {
+                let gx = Math.floor(Math.random() * (WIDTH - 4)) + 2;
+                let gy = Math.floor(Math.random() * HEIGHT);
+                let randomSymbol = glitchSymbols[Math.floor(Math.random() * glitchSymbols.length)];
+                
+                if(grid[gy] && grid[gy][gx]) {
+                    grid[gy][gx] = randomSymbol[0];
+                }
+            }
+        }
+
+        let textOutput = '';
+        for (let y = 0; y < HEIGHT; y++) {
+            textOutput += grid[y].join('') + '\n';
+        }
+        terminal.textContent = textOutput;
+    }
+</script>
+
+</body>
+</html>
+
